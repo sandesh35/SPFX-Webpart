@@ -26,7 +26,7 @@ export default class HeroWebPart extends BaseClientSideWebPart<IHeroWebPartProps
     this.domElement.innerHTML = `
       <div class="${ styles.hero }">
         <div class="${ styles.container }">
-        <div class="${ styles.row }" style="background-color:${this.properties.SolidColor}">
+        <div class="${ styles.row }" style="background-image:url(${this.properties.filePickerResult.fileAbsoluteUrl})"/>
             <div class="${ styles.column }">
               <center><p class="${ styles.description }">${escape(this.properties.Title)}</p></center>
              <center> <p class="${ styles.description }">${escape(this.properties.description)}</p></center>
