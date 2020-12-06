@@ -12,15 +12,42 @@ import { PropertyFieldFilePicker, IPropertyFieldFilePickerProps, IFilePickerResu
 import { escape } from '@microsoft/sp-lodash-subset';
 import styles from './HeroWebPart.module.scss';
 import * as strings from 'HeroWebPartStrings';
-
+import {
+  SPHttpClient,
+  SPHttpClientResponse   
+ } from '@microsoft/sp-http';
 export interface IHeroWebPartProps {
   Title:string;
   description: string;
   SolidColor:string;
   filePickerResult: IFilePickerResult;
 }
-
+export interface ISPLists {
+  Title: string;
+  atsNewsDescription : string;
+  atsNewsImageUrl: string;
+}
 export default class HeroWebPart extends BaseClientSideWebPart<IHeroWebPartProps> {
+
+  //componentDidMount() {  
+    //debugger;
+//alert("Hi");
+
+  //}
+
+ // public componentWillMount() {
+   // debugger;
+    //alert('hi');
+  //}
+  public onInit(): Promise<void> {
+    return super.onInit().then(_ => {
+      // other init code may be present
+      this._getListData().then((res)=>{
+        debugger;
+        console.log(res);
+      });
+    });
+  }
 
   public render(): void {
     this.domElement.innerHTML = `
@@ -37,11 +64,19 @@ export default class HeroWebPart extends BaseClientSideWebPart<IHeroWebPartProps
           </div>
         </div>
       </div>`;
-  }
+    }
 
   protected get dataVersion(): Version {
     return Version.parse('1.0');
   }
+
+  private _getListData(): Promise<ISPLists> {
+    return this.context.spHttpClient.get(this.context.pageContext.web.absoluteUrl + "/_api/web/lists/GetByTitle('News List')/Items",SPHttpClient.configurations.v1)
+        .then((response: SPHttpClientResponse) => {
+         
+        return response.json();
+        });
+    }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
     return {
@@ -82,14 +117,14 @@ export default class HeroWebPart extends BaseClientSideWebPart<IHeroWebPartProps
                   onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
                   properties: this.properties,
                   onSave: (e: IFilePickerResult) => { 
-                    debugger;
                     console.log(e); this.properties.filePickerResult = e; 
+                    
                    },
                   onChanged: (e: IFilePickerResult) => 
                   {
-                    debugger; 
                     console.log(e); 
                      this.properties.filePickerResult = e;
+                     this._getListData();
                        
                   },
                   key: "filePickerId",
